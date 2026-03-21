@@ -8,8 +8,12 @@ app = FastAPI()
 def root():
     return {"status": "server is running"}
 
+@app.get("/webhook")
+def webhook_get():
+    return {"status": "webhook route exists", "use": "POST for transcript data"}
+
 @app.post("/webhook")
-async def webhook(request: Request):
+async def webhook_post(request: Request):
     try:
         body = await request.json()
     except Exception:
@@ -23,7 +27,6 @@ async def webhook(request: Request):
     print("query params:", query_params)
     print("body:", body)
 
-    # Handle both possible payload shapes
     if isinstance(body, list):
         segments = body
         body_session_id = session_id
