@@ -8,10 +8,18 @@ app = FastAPI()
 def root():
     return {"status": "server is running"}
 
+# ✅ Handle GET (for Omi validation / browser checks)
 @app.get("/webhook")
-def webhook_get():
-    return {"status": "webhook route exists", "use": "POST for transcript data"}
+async def webhook_get(request: Request):
+    print("\n--- GET request received ---")
+    print("query params:", dict(request.query_params))
+    
+    return {
+        "status": "webhook alive",
+        "method": "GET"
+    }
 
+# ✅ Handle POST (actual transcript data)
 @app.post("/webhook")
 async def webhook_post(request: Request):
     try:
@@ -23,10 +31,11 @@ async def webhook_post(request: Request):
     uid = query_params.get("uid", "")
     session_id = query_params.get("session_id", "")
 
-    print("\n--- Incoming Request ---")
+    print("\n--- POST request received ---")
     print("query params:", query_params)
     print("body:", body)
 
+    # Handle payload shapes
     if isinstance(body, list):
         segments = body
         body_session_id = session_id
@@ -45,13 +54,7 @@ async def webhook_post(request: Request):
     print("session_id:", body_session_id)
     print("transcript:", transcript)
 
-    if "business idea" in transcript or "startup" in transcript:
-        return {
-            "session_id": body_session_id or "local-test",
-            "notification": {
-                "prompt": "You are mentoring {{user_name}}. Based on {{user_context}} and {{user_facts}}, give one practical startup next step in under 60 words.",
-                "params": ["user_name", "user_context", "user_facts"]
-            }
-        }
-
-    return {"session_id": body_session_id or "local-test", "ok": True}
+    return {
+        "session_id": body_session_id or "local-test",
+        "result": f"Received: {transcript}"
+    }
