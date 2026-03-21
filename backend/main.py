@@ -1,4 +1,4 @@
-pip install fastapi
+#pip3 install fastapi uvicorn (do on the terminal before running)
 
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
