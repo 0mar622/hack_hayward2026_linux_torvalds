@@ -19,9 +19,12 @@ Analyzes professional conversations (networking, interview, pitch) and extracts 
 
 ### Backend
 cd backend
+
 python3 -m uvicorn main:app --reload
 
 ### Frontend
 cd frontend
+
 npm install
+
 npm run dev
