@@ -1,10 +1,25 @@
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from services.ai_service import analyze_conversation
 
 app = FastAPI()
+
+# ✅ CORS (allows frontend to talk to backend)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def root():
     return {"status": "server is running"}
+
+
+# ================= WEBHOOK (existing code) =================
 
 # ✅ Handle GET (for Omi validation / browser checks)
 @app.get("/webhook")
@@ -16,6 +31,7 @@ async def webhook_get(request: Request):
         "status": "webhook alive",
         "method": "GET"
     }
+
 
 # ✅ Handle POST (actual transcript data)
 @app.post("/webhook")
@@ -56,3 +72,20 @@ async def webhook_post(request: Request):
         "session_id": body_session_id or "local-test",
         "result": f"Received: {transcript}"
     }
+
+
+# ================= ANALYZE ENDPOINT (NEW) =================
+
+class AnalyzeRequest(BaseModel):
+    transcript: str
+    mode: str
+
+
+@app.post("/analyze")
+async def analyze(req: AnalyzeRequest):
+    print("\n--- ANALYZE REQUEST ---")
+    print("transcript:", req.transcript)
+    print("mode:", req.mode)
+
+    result = analyze_conversation(req.transcript, req.mode)
+    return result

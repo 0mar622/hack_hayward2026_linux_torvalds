@@ -44,7 +44,12 @@ def analyze_conversation(transcript: str, mode: str) -> dict:
     def paraphrase(sent):
         t = sent
         t = re.sub(r"\bI'm\b|\bI am\b", "The speaker is", t, flags=re.I)
-        t = re.sub(r"\bI\b", "The speaker", t, flags=re.I)
+        t = re.sub(r"\bI can\b", "they can", t, flags=re.I)
+        t = re.sub(r"\bI\b", "they", t, flags=re.I)
+
+        # capitalize only if sentence starts with it
+        t = t[0].upper() + t[1:] if t else t
+        
         t = re.sub(r"\bmy\b", "their", t, flags=re.I)
         return t.strip()
 
@@ -105,7 +110,19 @@ def analyze_conversation(transcript: str, mode: str) -> dict:
         if i in used:
             continue
         if re.search(r'\b(hiring|role|position|opening|opportunity|looking for|we are looking|join|team|help|support|collaborate|volunteer|assist|work with)\b', s, re.I):
-            opportunity = paraphrase(s)
+            text = s.lower()
+            if "intern" in text:
+                opportunity = "Backend internship" if "backend" in text else "Internship"
+            elif "volunteer" in text:
+                opportunity = "Volunteer role"
+            elif "senior" in text:
+                opportunity = "Senior role"
+            elif "engineer" in text:
+                opportunity = "Engineering role"
+            elif "collaborate" in text or "work with" in text:
+                opportunity = "Collaboration"
+            else:
+                opportunity = "Opportunity"
             used.add(i)
             break
     
