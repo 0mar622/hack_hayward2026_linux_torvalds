@@ -1,6 +1,6 @@
 # hack_hayward2026_linux_torvalds
 
-# AI Conversation Assistant
+# AI Professional Conversation Assistant
 
 ## What it does
 Analyzes professional conversations (networking, interview, pitch) and extracts structured insights like summaries, opportunities, and follow-ups.
